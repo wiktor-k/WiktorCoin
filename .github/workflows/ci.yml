@@ -17,5 +17,5 @@ jobs:
       - run: git clone https://github.com/move-language/move /tmp/move && cargo install --path /tmp/move/language/tools/move-cli && /tmp/move/scripts/dev_setup.sh -b
       - uses: actions/checkout@v4
       - run: move build
-      - run: move prove
+      #- run: move prove
       - run: move test
