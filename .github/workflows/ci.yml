@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2024 Wiktor Kwapisiewicz <wiktor@metacode.biz>
+# SPDX-License-Identifier: CC0-1.0
+
+name: CI
+
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  check-files:
+    name: Check files
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt-get update && sudo apt-get install -y llvm clang gcc pkg-config build-essential lld
+      - run: git clone https://github.com/move-language/move /tmp/move && cargo install --path /tmp/move/language/tools/move-cli && /tmp/move/scripts/dev_setup.sh -b
+      - uses: actions/checkout@v4
+      - run: move build
