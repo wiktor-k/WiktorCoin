@@ -18,3 +18,4 @@ jobs:
       - uses: actions/checkout@v4
       - run: move build
       - run: move prove
+      - run: move test

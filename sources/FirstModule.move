@@ -54,4 +54,19 @@ module Addr::WiktorCoin {
         let balance_ref = &mut borrow_global_mut<Balance>(addr).coin.value;
         *balance_ref = balance + amount;
     }
+
+    #[test(account = @0x1)]
+    #[expected_failure]
+    fun mint_no_owner(account: signer) acquires Balance {
+        publish_balance(&account);
+        assert!(signer::address_of(&account) != MODULE_OWNER, 0);
+        mint(&account, @0x1, 10);
+    }
+
+    #[test(account = @0x1)]
+    fun public_balance_has_zero(account: signer) acquires Balance {
+        let addr = signer::address_of(&account);
+        publish_balance(&account);
+        assert!(balance_of(addr) == 0, 0);
+    }
 }
