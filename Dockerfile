@@ -22,5 +22,6 @@ COPY sources /coin/sources/
 WORKDIR /coin
 
 RUN move build
-RUN move test --state_on_error
+RUN move test --state_on_error --coverage
 RUN move prove
+RUN move coverage summary

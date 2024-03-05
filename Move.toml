@@ -1,5 +1,5 @@
 [package]
-name = "NamedAddr"
+name = "Addr"
 version = "0.0.0"
 
 [addresses]
