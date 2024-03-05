@@ -78,4 +78,37 @@ module Addr::WiktorCoin {
         publish_balance(&account);
         publish_balance(&account);
     }
+
+    #[test(account = @0x1)]
+    fun balance_of_dne(account: signer) acquires Balance {
+        let addr = signer::address_of(&account);
+        publish_balance(&account);
+        let balance = balance_of(addr);
+        assert!(balance == 0, 0);
+    }
+
+    #[test(account = @0x1)]
+    #[expected_failure] // how to check for MISSING_DATA here? (abort_code = 4008)
+    fun withdraw_dne(account: signer) acquires Balance {
+        let addr = signer::address_of(&account);
+        Coin { value: _ } = withdraw(addr, 0);
+    }
+
+    #[test(account = @0x1)]
+    #[expected_failure(abort_code = EINSUFFICIENT_BALANCE)]
+    fun withdraw_too_much(account: signer) acquires Balance {
+        let addr = signer::address_of(&account);
+        publish_balance(&account);
+        Coin { value: _ } = withdraw(addr, 1);
+    }
+
+    #[test(account = @Addr)]
+    fun can_withdraw_amount(account: signer) acquires Balance {
+        publish_balance(&account);
+        let amount = 1000;
+        let addr = signer::address_of(&account);
+        mint(&account, addr, amount);
+        let Coin { value } = withdraw(addr, amount);
+        assert!(value == amount, 0);
+    }
 }
