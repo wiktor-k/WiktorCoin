@@ -80,11 +80,18 @@ module Addr::WiktorCoin {
     }
 
     #[test(account = @0x1)]
-    fun balance_of_dne(account: signer) acquires Balance {
+    fun balance_of_empty(account: signer) acquires Balance {
         let addr = signer::address_of(&account);
         publish_balance(&account);
         let balance = balance_of(addr);
         assert!(balance == 0, 0);
+    }
+
+    #[test(account = @0x1)]
+    #[expected_failure]
+    fun balance_of_dne(account: signer) acquires Balance {
+        let addr = signer::address_of(&account);
+        balance_of(addr);
     }
 
     #[test(account = @0x1)]
