@@ -6,6 +6,7 @@ module Wiktor::Coin {
     const ENOT_MODULE_OWNER: u64 = 1;
     const EINSUFFICIENT_BALANCE: u64 = 2;
     const EALREADY_HAS_BALANCE: u64 = 3;
+    const EFROM_TO_EQUAL: u64 = 4;
 
     struct Coin<phantom CoinType> has store {
         value: u64,
@@ -42,8 +43,27 @@ module Wiktor::Coin {
 
     /// Transfers `amount` of tokens from `from` to `to`.
     public fun transfer<CoinType>(from: &signer, to: address, amount: u64) acquires Balance {
-        let coin = withdraw<CoinType>(signer::address_of(from), amount);
+        let from_addr = signer::address_of(from);
+        assert!(from_addr != to, EFROM_TO_EQUAL);
+        let coin = withdraw<CoinType>(from_addr, amount);
         deposit(to, coin);
+    }
+
+    spec transfer {
+        let from_addr = signer::address_of(from);
+        let balance_from = global<Balance<CoinType>>(from_addr).coin.value;
+        let balance_to = global<Balance<CoinType>>(to).coin.value;
+
+        aborts_if !exists<Balance<CoinType>>(from_addr);
+        aborts_if !exists<Balance<CoinType>>(to);
+        aborts_if balance_from < amount;
+        aborts_if balance_to + amount > MAX_U64;
+        aborts_if from_addr == to;
+
+        let post balance_from_post = global<Balance<CoinType>>(from_addr).coin.value;
+        let post balance_to_post = global<Balance<CoinType>>(to).coin.value;
+        ensures balance_from_post == balance_from - amount;
+        ensures balance_to_post == balance_to + amount;
     }
 
     fun withdraw<CoinType>(addr: address, amount: u64): Coin<CoinType> acquires Balance {
@@ -67,7 +87,7 @@ module Wiktor::Coin {
     fun deposit<CoinType>(addr: address, coin: Coin<CoinType>): () acquires Balance {
         let Coin<CoinType> { value: amount } = coin;
         let balance = balance_of<CoinType>(addr);
-        //assert!(balance >= amount, EINSUFFICIENT_BALANCE);
+        //assert!(balance + amount < MAX_U64, EBALANCE_OVERFLOW);
         let balance_ref = &mut borrow_global_mut<Balance<CoinType>>(addr).coin.value;
         *balance_ref = balance + amount;
     }
@@ -88,8 +108,9 @@ module Wiktor::Coin {
     #[expected_failure(abort_code = ENOT_MODULE_OWNER)]
     fun mint_no_owner(account: signer) acquires Balance {
         publish_balance<TestCoin>(&account);
-        assert!(signer::address_of(&account) != MODULE_OWNER, 0);
-        mint<TestCoin>(&account, @0x1, 10);
+        let addr = signer::address_of(&account);
+        assert!(addr != MODULE_OWNER, 0);
+        mint<TestCoin>(&account, addr, 10);
     }
 
     #[test(account = @0x1)]
@@ -104,6 +125,15 @@ module Wiktor::Coin {
     fun publish_balance_already_exists(account: signer) {
         publish_balance<TestCoin>(&account);
         publish_balance<TestCoin>(&account);
+    }
+
+    #[test(owner = @Wiktor, account = @0x1)]
+    #[expected_failure(abort_code = EFROM_TO_EQUAL)]
+    fun transfer_to_self(owner: signer, account: signer) acquires Balance {
+        publish_balance<TestCoin>(&account);
+        let addr = signer::address_of(&account);
+        mint<TestCoin>(&owner, addr, 10);
+        transfer<TestCoin>(&account, addr, 10);
     }
 
     #[test(account = @0x1)]
