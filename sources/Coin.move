@@ -25,6 +25,13 @@ module Wiktor::Coin {
         move_to(account, Balance<CoinType> { coin: empty });
     }
 
+    spec publish_balance {
+        let addr = signer::address_of(account);
+        aborts_if exists<Balance<CoinType>>(addr);
+        let post balance = global<Balance<CoinType>>(addr).coin.value;
+        ensures balance == 0;
+    }
+
     /// Mint `amount` tokens to `mint_addr`. Mint must be approved by the module owner.
     public fun mint<CoinType>(module_owner: &signer, mint_addr: address, amount: u64): () acquires Balance {
         assert!(signer::address_of(module_owner) == MODULE_OWNER, ENOT_MODULE_OWNER);
