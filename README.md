@@ -24,6 +24,7 @@ docker build .
 
 ## Resources
 
+- [The Move Book](https://move-language.github.io/move/)
 - [First impressions of the Move programming language](https://brson.github.io/2022/09/21/move-impressions)
 - [Verify Smart Contract: Move Prover Tutorials](https://cookbook.starcoin.org/docs/move/move-prover/mvp-tutorial/)
 
