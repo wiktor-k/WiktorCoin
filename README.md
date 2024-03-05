@@ -22,9 +22,10 @@ docker build .
 
 (Append `--progress=plain` when using Build X).
 
-## More
+## Resources
 
-See [First impressions of the Move programming language](https://brson.github.io/2022/09/21/move-impressions) for more details about Move.
+- [First impressions of the Move programming language](https://brson.github.io/2022/09/21/move-impressions)
+- [Verify Smart Contract: Move Prover Tutorials](https://cookbook.starcoin.org/docs/move/move-prover/mvp-tutorial/)
 
 ## Note
 
