@@ -2,6 +2,14 @@
 
 This project implements sample coins based on the [Move tutorial](https://github.com/move-language/move/tree/main/language/documentation/tutorial).
 
+```move
+module Wiktor::Coin {
+    use std::signer;
+
+    const MODULE_OWNER: address = @Wiktor;
+...
+```
+
 ## Infrastructure
 
 One addition over the tutorial is automatic CI configuration to build and test the coin and serves as a test for both this sample project and Move tooling.
