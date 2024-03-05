@@ -5,6 +5,7 @@ module Addr::WiktorCoin {
 
     const ENOT_MODULE_OWNER: u64 = 1;
     const EINSUFFICIENT_BALANCE: u64 = 2;
+    const EALREADY_HAS_BALANCE: u64 = 3;
 
     struct Coin has store {
         value: u64,
@@ -19,6 +20,7 @@ module Addr::WiktorCoin {
     /// minting or transferring to the account.
     public fun publish_balance(account: &signer) {
         let empty = Coin { value: 0 };
+        assert!(!exists<Balance>(signer::address_of(account)), EALREADY_HAS_BALANCE);
         move_to(account, Balance { coin: empty });
     }
 
@@ -68,5 +70,12 @@ module Addr::WiktorCoin {
         let addr = signer::address_of(&account);
         publish_balance(&account);
         assert!(balance_of(addr) == 0, 0);
+    }
+
+    #[test(account = @0x1)]
+    #[expected_failure(abort_code = EALREADY_HAS_BALANCE)]
+    fun publish_balance_already_exists(account: signer) {
+        publish_balance(&account);
+        publish_balance(&account);
     }
 }
