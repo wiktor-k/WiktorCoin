@@ -1,7 +1,7 @@
-module Addr::WiktorCoin {
+module Wiktor::Coin {
     use std::signer;
 
-    const MODULE_OWNER: address = @Addr;
+    const MODULE_OWNER: address = @Wiktor;
 
     const ENOT_MODULE_OWNER: u64 = 1;
     const EINSUFFICIENT_BALANCE: u64 = 2;
@@ -112,7 +112,7 @@ module Addr::WiktorCoin {
         Coin { value: _ } = withdraw<TestCoin>(addr, 1);
     }
 
-    #[test(account = @Addr)]
+    #[test(account = @Wiktor)]
     fun can_withdraw_amount(account: signer) acquires Balance {
         publish_balance<TestCoin>(&account);
         let amount = 1000;
