@@ -31,6 +31,14 @@ module Wiktor::Coin {
         deposit(mint_addr, Coin<CoinType> { value: amount });
     }
 
+    spec mint {
+        let balance = global<Balance<CoinType>>(mint_addr).coin.value;
+        aborts_if signer::address_of(module_owner) != MODULE_OWNER;
+        aborts_if balance + amount > MAX_U64;
+        aborts_if amount > MAX_U64;
+        aborts_if !exists<Balance<CoinType>>(mint_addr);
+     }
+
     /// Returns the balance of `owner`.
     public fun balance_of<CoinType>(owner: address): u64 acquires Balance {
         borrow_global<Balance<CoinType>>(owner).coin.value
