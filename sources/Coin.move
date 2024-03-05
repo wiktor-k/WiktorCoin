@@ -35,6 +35,11 @@ module Wiktor::Coin {
         borrow_global<Balance<CoinType>>(owner).coin.value
     }
 
+    spec balance_of {
+        pragma aborts_if_is_strict;
+        aborts_if !exists<Balance<CoinType>>(owner);
+    }
+
     /// Transfers `amount` of tokens from `from` to `to`.
     public fun transfer<CoinType>(from: &signer, to: address, amount: u64) acquires Balance {
         let coin = withdraw<CoinType>(signer::address_of(from), amount);
@@ -49,12 +54,31 @@ module Wiktor::Coin {
         Coin<CoinType> { value: amount }
     }
 
+    spec withdraw {
+        let balance = global<Balance<CoinType>>(addr).coin.value;
+        aborts_if !exists<Balance<CoinType>>(addr);
+        aborts_if balance < amount;
+
+        let post balance_post = global<Balance<CoinType>>(addr).coin.value;
+        ensures balance_post == balance - amount;
+        ensures result == Coin<CoinType> { value: amount };
+    }
+
     fun deposit<CoinType>(addr: address, coin: Coin<CoinType>): () acquires Balance {
         let Coin<CoinType> { value: amount } = coin;
         let balance = balance_of<CoinType>(addr);
         //assert!(balance >= amount, EINSUFFICIENT_BALANCE);
         let balance_ref = &mut borrow_global_mut<Balance<CoinType>>(addr).coin.value;
         *balance_ref = balance + amount;
+    }
+
+    spec deposit {
+        let balance = global<Balance<CoinType>>(addr).coin.value;
+        aborts_if !exists<Balance<CoinType>>(addr);
+        aborts_if balance + coin.value > MAX_U64;
+
+        let post balance_post = global<Balance<CoinType>>(addr).coin.value;
+        ensures balance_post == balance + coin.value;
     }
 
     #[test_only]
