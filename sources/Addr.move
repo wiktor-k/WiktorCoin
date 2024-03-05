@@ -58,7 +58,7 @@ module Addr::WiktorCoin {
     }
 
     #[test(account = @0x1)]
-    #[expected_failure]
+    #[expected_failure(abort_code = ENOT_MODULE_OWNER)]
     fun mint_no_owner(account: signer) acquires Balance {
         publish_balance(&account);
         assert!(signer::address_of(&account) != MODULE_OWNER, 0);
