@@ -1,7 +1,7 @@
-module Wiktor::Coin {
+module wiktor::coin {
     use std::signer;
 
-    const MODULE_OWNER: address = @Wiktor;
+    const MODULE_OWNER: address = @wiktor;
 
     const ENOT_MODULE_OWNER: u64 = 1;
     const EINSUFFICIENT_BALANCE: u64 = 2;
@@ -142,7 +142,7 @@ module Wiktor::Coin {
         publish_balance<TestCoin>(&account);
     }
 
-    #[test(owner = @Wiktor, account = @0x1)]
+    #[test(owner = @wiktor, account = @0x1)]
     #[expected_failure(abort_code = EFROM_TO_EQUAL)]
     fun transfer_to_self(owner: signer, account: signer) acquires Balance {
         publish_balance<TestCoin>(&account);
@@ -181,7 +181,7 @@ module Wiktor::Coin {
         Coin { value: _ } = withdraw<TestCoin>(addr, 1);
     }
 
-    #[test(account = @Wiktor)]
+    #[test(account = @wiktor)]
     fun can_withdraw_amount(account: signer) acquires Balance {
         publish_balance<TestCoin>(&account);
         let amount = 1000;

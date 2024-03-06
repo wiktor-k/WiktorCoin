@@ -1,12 +1,12 @@
-# WiktorCoin
+# WiktorCoin 🪙
 
 This project implements sample coins based on the [Move tutorial](https://github.com/move-language/move/tree/main/language/documentation/tutorial).
 
 ```move
-module Wiktor::Coin {
+module wiktor::coin {
     use std::signer;
 
-    const MODULE_OWNER: address = @Wiktor;
+    const MODULE_OWNER: address = @wiktor;
 ...
 ```
 

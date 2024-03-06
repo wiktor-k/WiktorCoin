@@ -1,9 +1,9 @@
 [package]
-name = "Wiktor"
+name = "wiktor"
 version = "0.0.0"
 
 [addresses]
-Wiktor = "0xDEADBEEF"
+wiktor = "0xDEADBEEF"
 
 [dependencies]
 MoveStdlib = { local = "/tmp/move/language/move-stdlib/", addr_subst = { "std" = "0x1" } }
