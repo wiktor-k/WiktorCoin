@@ -64,19 +64,11 @@ module wiktor::coin {
 
     spec transfer {
         let from_addr = signer::address_of(from);
-        let balance_from = global<Balance<CoinType>>(from_addr).coin.value;
-        let balance_to = global<Balance<CoinType>>(to).coin.value;
 
-        aborts_if !exists<Balance<CoinType>>(from_addr);
-        aborts_if !exists<Balance<CoinType>>(to);
-        aborts_if balance_from < amount;
-        aborts_if balance_to + amount > MAX_U64;
+        include WithdrawSchema<CoinType> { addr: from_addr };
+        include DepositSchema<CoinType> { addr: to };
+
         aborts_if from_addr == to;
-
-        let post balance_from_post = global<Balance<CoinType>>(from_addr).coin.value;
-        let post balance_to_post = global<Balance<CoinType>>(to).coin.value;
-        ensures balance_from_post == balance_from - amount;
-        ensures balance_to_post == balance_to + amount;
     }
 
     fun withdraw<CoinType>(addr: address, amount: u64): Coin<CoinType> acquires Balance {
@@ -88,13 +80,20 @@ module wiktor::coin {
     }
 
     spec withdraw {
+        include WithdrawSchema<CoinType>;
+        ensures result == Coin<CoinType> { value: amount };
+    }
+
+    spec schema WithdrawSchema<CoinType> {
+        addr: address;
+        amount: u64;
+
         let balance = global<Balance<CoinType>>(addr).coin.value;
         aborts_if !exists<Balance<CoinType>>(addr);
         aborts_if balance < amount;
 
         let post balance_post = global<Balance<CoinType>>(addr).coin.value;
         ensures balance_post == balance - amount;
-        ensures result == Coin<CoinType> { value: amount };
     }
 
     fun deposit<CoinType>(addr: address, coin: Coin<CoinType>): () acquires Balance {
