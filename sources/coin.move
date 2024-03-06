@@ -27,6 +27,13 @@ module wiktor::coin {
 
     spec publish_balance {
         let addr = signer::address_of(account);
+
+        include PublishSchema<CoinType>;
+    }
+
+    spec schema PublishSchema<CoinType> {
+        addr: address;
+
         aborts_if exists<Balance<CoinType>>(addr);
         let post balance = global<Balance<CoinType>>(addr).coin.value;
         ensures balance == 0;
