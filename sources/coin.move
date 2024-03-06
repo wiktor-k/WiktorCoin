@@ -39,11 +39,9 @@ module wiktor::coin {
     }
 
     spec mint {
-        let balance = global<Balance<CoinType>>(mint_addr).coin.value;
+        include DepositSchema<CoinType> { addr: mint_addr };
+
         aborts_if signer::address_of(module_owner) != MODULE_OWNER;
-        aborts_if balance + amount > MAX_U64;
-        aborts_if amount > MAX_U64;
-        aborts_if !exists<Balance<CoinType>>(mint_addr);
      }
 
     /// Returns the balance of `owner`.
@@ -108,12 +106,19 @@ module wiktor::coin {
     }
 
     spec deposit {
+        include DepositSchema<CoinType> { amount: coin.value };
+    }
+
+    spec schema DepositSchema<CoinType> {
+        addr: address;
+        amount: u64;
+
         let balance = global<Balance<CoinType>>(addr).coin.value;
         aborts_if !exists<Balance<CoinType>>(addr);
-        aborts_if balance + coin.value > MAX_U64;
+        aborts_if balance + amount > MAX_U64;
 
         let post balance_post = global<Balance<CoinType>>(addr).coin.value;
-        ensures balance_post == balance + coin.value;
+        ensures balance_post == balance + amount;
     }
 
     #[test_only]
